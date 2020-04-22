@@ -3,10 +3,10 @@ services:
   - docker
 
 before_install:
-  - docker build -t pboskovic/react-test -f ./client/Dockerfile.dev . /client
+  - docker build -t pboskovic/react-test -f ./client/Dockerfile.dev ./client
 
 script:
-  - docker run pboskovic/react-test npm test -- --coverage
+  - docker run -e CI=true pboskovic/react-test npm test -- --coverage
 
 after_success:
   - docker build -t pboskovic/multi-client ./client
