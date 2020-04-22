@@ -1,0 +1,22 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t pboskovic/react-test -f ./client/Dockerfile.dev . /client
+
+script:
+  - docker run pboskovic/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t pboskovic/multi-client ./client
+  - docker build -t pboskovic/multi-nginx ./nginx
+  - docker build -t pboskovic/multi-server ./server
+  - docker build -t pboskovic/multi-worker ./worker
+  # Log in to the Docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take those images and push them to docker hub
+  - docker push pboskovic/multi-client
+  - docker push pboskovic/multi-nginx
+  - docker push pboskovic/multi-server
+  - docker push pboskovic/multi-worker
